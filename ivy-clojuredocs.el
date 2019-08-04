@@ -30,7 +30,7 @@
 ;;; Code:
 
 (require 'ivy)
-(require 'counsel)
+(require 'browse-url)
 (require 'edn)
 
 (defgroup ivy-clojuredocs nil
@@ -86,8 +86,10 @@
 (defun ivy-clojuredocs-fmt-web-entry (e)
   (if (string-match "on clojuredocs.org$" e)
       (format "search?q=%s" (cadr (split-string e "'")))
-    (let* ((le (split-string entry " ")))
-      (replace-regexp-in-string "?" "_q" (string-join (nbutlast le) "/")))))
+    (let* ((le (remove-if #'string-empty-p
+                          (split-string entry " "))))
+      (replace-regexp-in-string "?" "_q"
+                                (string-join (nbutlast le) "/")))))
 
 (defun ivy-clojuredocs--clean-cache ()
   (clrhash ivy-clojuredocs-cache))
