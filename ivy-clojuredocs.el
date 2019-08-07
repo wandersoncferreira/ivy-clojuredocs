@@ -32,6 +32,7 @@
 (require 'ivy)
 (require 'browse-url)
 (require 'edn)
+(require 'cl)
 
 (defgroup ivy-clojuredocs nil
   "Ivy applications"
@@ -121,8 +122,7 @@ We can pass an INITIAL-INPUT value to be the first candidate searched."
             :dynamic-collection t
             :history #'ivy-clojuredocs-history
             :action (lambda (entry)
-                      (browse-url (concat ivy-clojuredocs-url
-                                          (ivy-clojuredocs-fmt-web-entry entry))))
+                      (browse-url (concat ivy-clojuredocs-url (ivy-clojuredocs-fmt-web-entry entry))))
             :unwind #'ivy-clojuredocs--clean-cache
             :caller #'ivy-clojuredocs))
 
