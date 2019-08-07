@@ -1,4 +1,4 @@
-;;; ivy-clojuredocs.el --- search for help in clojuredocs.org
+;;; ivy-clojuredocs.el --- search for help in clojuredocs.org -*- lexical-binding: t; -*-
 
 ;; Author: Wanderson Ferreira <iagwanderson@gmail.com>
 ;; URL: https://github.com/wandersoncferreira/ivy-clojuredocs
@@ -62,7 +62,7 @@
 (defun ivy-clojuredocs--parse-response-buffer (buffer)
   "Get the BUFFER with the response content and parse each returned entry."
   (cl-loop for i in (edn-read buffer)
-           collect (ivy-clojuredocs--parse-entries i) into result
+           collect (ivy-clojuredocs--parse-entry i) into result
            finally return result))
 
 (defun ivy-clojuredocs-fetch (candidate)
@@ -119,11 +119,12 @@ We can pass an INITIAL-INPUT value to be the first candidate searched."
   (ivy-read "ClojureDocs: " #'ivy-clojuredocs-candidates
             :initial-input initial-input
             :dynamic-collection t
-            :history 'ivy-clojuredocs-history
+            :history #'ivy-clojuredocs-history
             :action (lambda (entry)
-                      (browse-url (concat ivy-clojuredocs-url (ivy-clojuredocs-fmt-web-entry entry))))
+                      (browse-url (concat ivy-clojuredocs-url
+                                          (ivy-clojuredocs-fmt-web-entry entry))))
             :unwind #'ivy-clojuredocs--clean-cache
-            :caller 'ivy-clojuredocs))
+            :caller #'ivy-clojuredocs))
 
 ;;;###autoload
 (defun ivy-clojuredocs ()
