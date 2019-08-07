@@ -32,7 +32,7 @@
 (require 'ivy)
 (require 'browse-url)
 (require 'edn)
-(require 'cl)
+(require 'cl-lib)
 
 (defgroup ivy-clojuredocs nil
   "Ivy applications"
@@ -100,8 +100,8 @@ The idea is to return a string that is useful to the `browse-url'
 function."
   (if (string-match "on clojuredocs.org$" entry)
       (format "search?q=%s" (cadr (split-string entry "'")))
-    (let* ((lentry (remove-if #'string-empty-p
-                          (split-string entry " "))))
+    (let* ((lentry (cl-remove-if #'string-empty-p
+                                 (split-string entry " "))))
       (replace-regexp-in-string "?" "_q"
                                 (string-join (nbutlast lentry) "/")))))
 
