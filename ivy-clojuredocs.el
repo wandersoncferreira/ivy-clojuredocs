@@ -52,27 +52,37 @@
 (defvar ivy-clojuredocs-cache (make-hash-table :test 'equal))
 (defvar ivy-clojuredocs-history nil)
 
-(defun ivy-clojuredocs--parse-entries (entry)
+(defun ivy-clojuredocs--parse-entry (entry)
+  "Parse each ENTRY returned by ClojureDocs API."
   (let ((cd-namespace (or (gethash ':ns entry) ""))
         (cd-type (or (gethash ':type entry) ""))
         (cd-name (gethash ':name entry)))
     (format "%s %s %s" cd-namespace cd-name cd-type)))
 
-(defun ivy-clojuredocs--parse-response (response)
-  (cl-loop for i in (edn-read response)
+(defun ivy-clojuredocs--parse-response-buffer (buffer)
+  "Get the BUFFER with the response content and parse each returned entry."
+  (cl-loop for i in (edn-read buffer)
            collect (ivy-clojuredocs--parse-entries i) into result
            finally return result))
 
-(defun ivy-clojuredocs-fetch (entry)
-  (let ((url (concat ivy-clojuredocs-url "ac-search?query=" entry)))
+(defun ivy-clojuredocs-fetch (candidate)
+  "Call the ClojureDocs API for a given CANDIDATE.
+Place the parsed results in cache.T he cache data structure is a
+hash-table whose keys are the searched candidates."
+  (let ((url (concat ivy-clojuredocs-url "ac-search?query=" candidate)))
     (with-current-buffer (url-retrieve-synchronously url)
       (goto-char (point-min))
       (when (re-search-forward "\\(({.+})\\)" nil t)
-        (puthash entry
-                 (ivy-clojuredocs--parse-response (match-string 0))
+        (puthash candidate
+                 (ivy-clojuredocs--parse-response-buffer (match-string 0))
                  ivy-clojuredocs-cache)))))
 
 (defun ivy-clojuredocs-candidates (str &rest _u)
+  "Orchestrate call to get suggestions to candidate (STR).
+There are two behaviors here, at the first search we cache the
+returned data for this candidate (STR) in a hash-table data
+structure.  Second search in the same candidate, will capture the
+data from cache."
   (if (< (length str) ivy-clojuredocs-min-chars-number)
       (ivy-more-chars)
     (let ((candidates (or (gethash str ivy-clojuredocs-cache)
@@ -83,22 +93,29 @@
          candidates
          (list (format "Search for '%s' on clojuredocs.org" str)))))))
 
-(defun ivy-clojuredocs-fmt-web-entry (e)
-  (if (string-match "on clojuredocs.org$" e)
-      (format "search?q=%s" (cadr (split-string e "'")))
-    (let* ((le (remove-if #'string-empty-p
+(defun ivy-clojuredocs-fmt-web-entry (entry)
+  "Parse an given ENTRY called by ivy-action.
+The idea is to return a string that is useful to the `browse-url'
+function."
+  (if (string-match "on clojuredocs.org$" entry)
+      (format "search?q=%s" (cadr (split-string entry "'")))
+    (let* ((lentry (remove-if #'string-empty-p
                           (split-string entry " "))))
       (replace-regexp-in-string "?" "_q"
-                                (string-join (nbutlast le) "/")))))
+                                (string-join (nbutlast lentry) "/")))))
 
 (defun ivy-clojuredocs--clean-cache ()
+  "Clear the cache data structure for `ivy-clojuredocs' previous search."
   (clrhash ivy-clojuredocs-cache))
 
 (defun ivy-clojuredocs-thing-at-point (thing)
+  "Preprocess THING to be given as parameter as a candidate to search."
   (when thing
     (first (last (split-string thing "/")))))
 
 (defun ivy-clojuredocs-invoke (&optional initial-input)
+  "Ivy function to read and display candidates to the user.
+We can pass an INITIAL-INPUT value to be the first candidate searched."
   (ivy-read "ClojureDocs: " #'ivy-clojuredocs-candidates
             :initial-input initial-input
             :dynamic-collection t
@@ -110,11 +127,13 @@
 
 ;;;###autoload
 (defun ivy-clojuredocs ()
+  "Search for help at ClojureDocs API."
   (interactive)
   (ivy-clojuredocs-invoke))
 
 ;;;###autoload
 (defun ivy-clojuredocs-at-point ()
+  "Search for help using word at point at ClojureDocs API."
   (interactive)
   (ivy-clojuredocs-invoke (ivy-clojuredocs-thing-at-point (thing-at-point 'symbol))))
 
