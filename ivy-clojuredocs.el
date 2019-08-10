@@ -1,10 +1,10 @@
-;;; ivy-clojuredocs.el --- search for help in clojuredocs.org -*- lexical-binding: t; -*-
+;;; ivy-clojuredocs.el --- Search for help in clojuredocs.org -*- lexical-binding: t; -*-
 
 ;; Author: Wanderson Ferreira <iagwanderson@gmail.com>
 ;; URL: https://github.com/wandersoncferreira/ivy-clojuredocs
-;; Package-Requires: ((edn "1.1.2") (ivy "0.12.0"))
+;; Package-Requires: ((edn "1.1.2") (ivy "0.12.0") (emacs "24.4"))
 ;; Version: 0.1
-;; Keywords: ivy, clojure
+;; Keywords: matching
 
 ;; Copyright (C) 2019 Wanderson Ferreira <iagwanderson@gmail.com>
 
@@ -19,7 +19,7 @@
 ;; GNU General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
@@ -39,7 +39,7 @@
   :group 'ivy)
 
 (defcustom ivy-clojuredocs-url
-  "http://clojuredocs.org/"
+  "https://clojuredocs.org/"
   "Url used for searching in ClojureDocs website."
   :type 'string
   :group 'ivy-clojuredocs)
@@ -51,7 +51,6 @@
   :group 'ivy-clojuredocs)
 
 (defvar ivy-clojuredocs-cache (make-hash-table :test 'equal))
-(defvar ivy-clojuredocs-history nil)
 
 (defun ivy-clojuredocs--parse-entry (entry)
   "Parse each ENTRY returned by ClojureDocs API."
@@ -120,7 +119,6 @@ We can pass an INITIAL-INPUT value to be the first candidate searched."
   (ivy-read "ClojureDocs: " #'ivy-clojuredocs-candidates
             :initial-input initial-input
             :dynamic-collection t
-            :history #'ivy-clojuredocs-history
             :action (lambda (entry)
                       (browse-url (concat ivy-clojuredocs-url (ivy-clojuredocs-fmt-web-entry entry))))
             :unwind #'ivy-clojuredocs--clean-cache
