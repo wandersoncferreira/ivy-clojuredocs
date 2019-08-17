@@ -5,9 +5,22 @@ Easily search the ClojureDocs from your favorite Editor =)
 
 # Installation
 
-For now I'm using `quelpa` to install directly from this Github repository.
+We are on [MELPA](http://melpa.org) now.
 
-If you want this package on [MELPA](http://melpa.org), please drop me a line on the issue list.
+```
+M-x package-refresh-contents
+M-x package-install RET ivy-clojuredocs
+```
+
+Using `use-package` with a binding suggestion:
+```
+(use-package ivy-clojuredocs
+  :ensure t
+  :bind (:map clojure-mode-map
+              (("C-c d" . ivy-clojuredocs-at-point))))
+```
+
+Using `quelpa` to install directly from this github repository:
 
 ```elisp
 (quelpa '(ivy-clojuredocs :repo "wandersoncferreira/ivy-clojuredocs" :fetcher github))
