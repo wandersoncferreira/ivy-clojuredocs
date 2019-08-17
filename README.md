@@ -26,6 +26,15 @@ Using `quelpa` to install directly from this github repository:
 (quelpa '(ivy-clojuredocs :repo "wandersoncferreira/ivy-clojuredocs" :fetcher github))
 ```
 
+
+# Usage
+
+There are two public functions available:
+
+- `ivy-clojuredocs`: which search at the website interactively
+- `ivy-clojuredocs-at-point`: which uses the name of the function 
+at point to populate the interactive prompt.
+
 Happy hacking!
 
 # LICENSE
