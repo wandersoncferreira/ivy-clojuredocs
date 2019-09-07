@@ -111,7 +111,7 @@ function."
 (defun ivy-clojuredocs-thing-at-point (thing)
   "Preprocess THING to be given as parameter as a candidate to search."
   (when thing
-    (first (last (split-string thing "/")))))
+    (car (last (split-string thing "/")))))
 
 (defun ivy-clojuredocs-invoke (&optional initial-input)
   "Ivy function to read and display candidates to the user.
