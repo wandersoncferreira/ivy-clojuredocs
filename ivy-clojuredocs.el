@@ -33,6 +33,7 @@
 (require 'browse-url)
 (require 'edn)
 (require 'cl-lib)
+(require 'subr-x)
 
 (defgroup ivy-clojuredocs nil
   "Ivy applications"
