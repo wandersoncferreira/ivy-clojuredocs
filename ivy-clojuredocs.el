@@ -31,7 +31,7 @@
 
 (require 'ivy)
 (require 'browse-url)
-(require 'edn)
+(require 'parseedn)
 (require 'cl-lib)
 (require 'subr-x)
 
@@ -62,7 +62,7 @@
 
 (defun ivy-clojuredocs--parse-response-buffer (buffer)
   "Get the BUFFER with the response content and parse each returned entry."
-  (cl-loop for i in (edn-read buffer)
+  (cl-loop for i in (parseedn-read-str buffer)
            collect (ivy-clojuredocs--parse-entry i) into result
            finally return result))
 
